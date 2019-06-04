@@ -1,3 +1,4 @@
+
 var scene = new THREE.Scene();
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -5,220 +6,152 @@ var camera = new THREE.PerspectiveCamera( 75 , width / height , 0.1 , 10000 );
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( width , height );
 document.body.appendChild( renderer.domElement );
+var mouse = { x: 0, y: 0 } , INTERSECTED; 
+var projector = new THREE.Projector();
+
+
 var geometry = new THREE.SphereGeometry( 300 , 100 , 100 );
-var material = new THREE.MeshLambertMaterial( { map : new THREE.TextureLoader().load('./img/earthmap1k.jpg') } );
+var material = new THREE.MeshLambertMaterial( { map : new THREE.TextureLoader().load(' ./img/earthmap1k.jpg') } ); //./img/earthmap1k.jpg
 var sphere = new THREE.Mesh( geometry , material );
 scene.add( sphere );
-camera.position.z = 750 ;
+camera.position.z = 700 ;
 
-var light = new THREE.PointLight(0x0000FF,1);
+
+var light = new THREE.PointLight(0xFFFFFF,1);
 light.position.set( 5000,0,5000);
 scene.add(light);
-var light1 = new THREE.PointLight(0xF02F06,3);
+var light1 = new THREE.PointLight(0xEAAC17,3);
 light1.position.set( -500,500,500 );
 scene.add(light1);
 
 
-var textures = [ ];
-textures[ 0 ] = new THREE.TextureLoader().load( ' ./img/cricbuzz.png ' );                          
-textures[ 1 ] = new THREE.TextureLoader().load( ' ./img/nitdgp.png ' );                           
-textures[ 2 ] = new THREE.TextureLoader().load( ' ./img/threejs.png ' );                           
-textures[ 3 ] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );
-textures[ 4 ] = new THREE.TextureLoader().load( ' ./img/cricbuzz.png ' );                          
-textures[ 5 ] = new THREE.TextureLoader().load( ' ./img/nitdgp.png ' );                           
-textures[ 6 ] = new THREE.TextureLoader().load( ' ./img/threejs.png ' );                           
-textures[ 7 ] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );
-textures[ 8 ] = new THREE.TextureLoader().load( ' ./img/cricbuzz.png ' );                          
-textures[ 9 ] = new THREE.TextureLoader().load( ' ./img/nitdgp.png ' );                           
-textures[ 10 ] = new THREE.TextureLoader().load( ' ./img/threejs.png ' );                           
-textures[ 11] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );
-textures[ 12] = new THREE.TextureLoader().load( ' ./img/cricbuzz.png ' );                          
-textures[ 13] = new THREE.TextureLoader().load( ' ./img/nitdgp.png ' );                           
-textures[ 14] = new THREE.TextureLoader().load( ' ./img/threejs.png ' );                           
-textures[ 15] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );
-textures[ 16] = new THREE.TextureLoader().load( ' ./img/cricbuzz.png ' );                          
-textures[ 17] = new THREE.TextureLoader().load( ' ./img/nitdgp.png ' );                           
-textures[ 18] = new THREE.TextureLoader().load( ' ./img/threejs.png ' );                           
-textures[ 19] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );
-textures[ 20] = new THREE.TextureLoader().load( ' ./img/cricbuzz.png ' );                          
-textures[ 21] = new THREE.TextureLoader().load( ' ./img/nitdgp.png ' );                           
-textures[ 22] = new THREE.TextureLoader().load( ' ./img/threejs.png ' );                           
-textures[ 23] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );
+controls = new THREE.OrbitControls( camera , renderer.domElement );
 
 
-
-var materialTtextures = [ ];
-for ( var i = 0 ;i < 24 ; i++ )
+var plateGeo = new THREE.PlaneGeometry( 71 , 41 );
+var plateMat = new THREE.MeshLambertMaterial({ color : 0xFFFFFF , transparent: true, opacity: 1 } );
+var plates = [];
+for ( var i = 0 ; i < 6 ; i++ )
 {
-    materialTtextures[ i ] = new THREE.MeshBasicMaterial( { map  : textures[ i ] , transparent : true , opacity : 0.8 , side : THREE.DoubleSide } );
+    plates[i] = new THREE.Mesh(plateGeo , plateMat[i]);
 }
 
 
-var picGeometry = new THREE.CircleGeometry( 70 , 80 );
-var pics = [ ];
-for ( var i = 0 ; i < 24 ; i++ )
+var textures = [ ];
+textures[ 0 ] = new THREE.TextureLoader().load( './img/cricbuzz.png ' );  //./img/cricbuzz.png                          
+textures[ 1 ] = new THREE.TextureLoader().load( ' ./img/nitdgp.png' );  //./img/nitdgp.png                         
+textures[ 2 ] = new THREE.TextureLoader().load( ' ./img/threejs.png  ' );  //./img/threejs.png                         
+textures[ 3 ] = new THREE.TextureLoader().load( ' ./img/youtube.jpg ' );  //./img/youtube.jpg                         
+
+
+var picGeo = new THREE.PlaneGeometry( 70 ,40 );
+var picMat = [];
+for ( var i = 0 ; i < 4 ; i++ )
 {
-    pics[ i ] = new THREE.Mesh( picGeometry , materialTtextures[ i ] );
+    picMat[i] = new THREE.MeshLambertMaterial({ map : textures[i] , transparent : true , opacity : 1 ,side : THREE.DoubleSide });
+}
+var pics = [] ;
+for ( var i = 0 ; i < 4 ; i++ )
+{
+    pics[i] = new THREE.Mesh( picGeo , picMat[i] );
+}
+
+
+
+
+var cylTtextures = [ ];
+for ( var i = 0 ;i < 4 ; i++ )
+{
+    cylTtextures[ i ] = new THREE.MeshLambertMaterial( { color : 0xFFFFFF , transparent : true , opacity : 0.3 , side : THREE.DoubleSide } );
+}
+
+
+var rodGeometry = new THREE.CylinderGeometry( 2 , 2 , 150 ,32 );
+var rods = [ ];
+for ( var i = 0 ; i < 4 ; i++ )
+{
+    rods[ i ] = new THREE.Mesh( rodGeometry , cylTtextures[ i ] );
     
 }
+rods[0].callback = cricbuzz;
+function cricbuzz()
+{
+    window.open('https://www.cricbuzz.com/');
+}
+rods[1].callback = nitdgp;
+function nitdgp()
+{
+    window.open('https://www.nitdgp.ac.in/');
+}
+rods[2].callback = threejs;
+function threejs()
+{
+    window.open('https://threejs.org/');
+}
+rods[3].callback = youtube;
+function youtube()
+{
+    window.open('https://www.youtube.com/');
+}
+plates[0].callback = cricbuzz;
+plates[1].callback = nitdgp;
+plates[2].callback = threejs;
+plates[3].callback = youtube;
+
 pics[0].callback = cricbuzz;
-function cricbuzz()
-{
-    window.open('https://www.cricbuzz.com/');
-}
 pics[1].callback = nitdgp;
-function nitdgp()
-{
-    window.open('https://www.nitdgp.ac.in/');
-}
 pics[2].callback = threejs;
-function threejs()
-{
-    window.open('https://threejs.org/');
-}
 pics[3].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[4].callback = cricbuzz;
-function cricbuzz()
-{
-    window.open('https://www.cricbuzz.com/');
-}
-pics[5].callback = nitdgp;
-function nitdgp()
-{
-    window.open('https://www.nitdgp.ac.in/');
-}
-pics[6].callback = threejs;
-function threejs()
-{
-    window.open('https://threejs.org/');
-}
-pics[7].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[8].callback = cricbuzz;
-function cricbuzz()
-{
-    window.open('https://www.cricbuzz.com/');
-}
-pics[9].callback = nitdgp;
-function nitdgp()
-{
-    window.open('https://www.nitdgp.ac.in/');
-}
-pics[10].callback = threejs;
-function threejs()
-{
-    window.open('https://threejs.org/');
-}
-pics[11].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[12].callback = cricbuzz;
-function cricbuzz()
-{
-    window.open('https://www.cricbuzz.com/');
-}
-pics[13].callback = nitdgp;
-function nitdgp()
-{
-    window.open('https://www.nitdgp.ac.in/');
-}
-pics[14].callback = threejs;
-function threejs()
-{
-    window.open('https://threejs.org/');
-}
-pics[15].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[16].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[17].callback = cricbuzz;
-function cricbuzz()
-{
-    window.open('https://www.cricbuzz.com/');
-}
-pics[18].callback = nitdgp;
-function nitdgp()
-{
-    window.open('https://www.nitdgp.ac.in/');
-}
-pics[19].callback = threejs;
-function threejs()
-{
-    window.open('https://threejs.org/');
-}
-pics[20].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[21].callback = youtube;
-function youtube()
-{
-    window.open('https://www.youtube.com/');
-}
-pics[22].callback = cricbuzz;
-function cricbuzz()
-{
-    window.open('https://www.cricbuzz.com/');
-}
-pics[23].callback = nitdgp;
-function nitdgp()
-{
-    window.open('https://www.nitdgp.ac.in/');
-}
+
+
+rods[0].position.set( -50 , 200 , 220 );
+rods[1].position.set(  265 , 100 , -100 );
+rods[2].position.set( 100 ,-100 , 265 );
+rods[3].position.set( -40 , 275 , -114 );
 
 
 
-pics[0].position.set( 301 , 0 , 0 );
-pics[1].position.set(  0 , 0 , -301 );
-pics[2].position.set( -301 ,0 , 0 );
-pics[3].position.set( 0 , 0 , 301 );
-pics[4].position.set( -213 , 0 , 213 );
-pics[5].position.set( -213 , 0 , -213 );
-pics[6].position.set( 213 , 0 , -213 );
-pics[7].position.set( 213 , 0 , 213 );
-pics[8].position.set( 0 , 213 , 213 );
-pics[9].position.set( 0 , -213 , 213 );
-pics[10].position.set( 0 , 301 , -301 );
-pics[11].position.set( 0 , -301 , 301 );
-pics[12].position.set( 173.8 , 173.8 , 173.8 );
-pics[13].position.set( -173.8 , 173.8 , 173.8 );
-pics[14].position.set( 173.8 , -173.8 , 173.8 );
-pics[15].position.set( -173.8 , -173.8 , 173.8 );
-pics[16].position.set( 213 , 0 , -213 );
-pics[17].position.set( -213 , 0 , 213 );
-pics[18].position.set( 213 , 0 , -213 );
-pics[19].position.set( -213 , 0 , 213 );
-pics[20].position.set( 173.8 , 173.8 , 173.8 );
-pics[21].position.set( 173.8 , 173.8 , -173.8 );
-pics[22].position.set( 173.8 , -173.8 , -173.8 );
-pics[23].position.set( 173.8 , -173.8 , 173.8 );
+rods[0].lookAt(new THREE.Vector3(-55,245,155));
+rods[1].lookAt(new THREE.Vector3(270,95,-105));
+rods[2].lookAt(new THREE.Vector3(95,-95,260));
+rods[3].lookAt(new THREE.Vector3(301,301,0));
 
 
-for ( i = 0 ; i< 24 ; i++ )
-{
-    pics[i].lookAt(new THREE.Vector3(0,0,0));
-}
+
+plates[0].position.set( -80 , 247 , 250 );
+plates[1].position.set(  280 , 145 , -150 );
+plates[2].position.set( 97 ,-60 , 315 );
+plates[3].position.set( -80 , 330 , -114 );
+//plates[1].rotation.z += 0.45;
 
 
-for ( i = 0 ; i < 24 ; i++ )
+
+plates[0].lookAt( new THREE.Vector3(-60,310,155));
+plates[1].lookAt( new THREE.Vector3(550,30,-210));
+plates[2].lookAt( new THREE.Vector3( 35,-10,260 ));
+//plates[3].lookAt( new THREE.Vector3());
+
+pics[0].position.set( -80 , 247 , 250 );
+pics[1].position.set(  280 , 145 , -150 );
+pics[2].position.set( 97 ,-60 , 315 );
+pics[3].position.set( -80 , 330 , -114 );
+
+
+
+
+pics[0].lookAt( new THREE.Vector3(-60,310,155));
+pics[1].lookAt( new THREE.Vector3(550,30,-210));
+pics[2].lookAt( new THREE.Vector3( 35,-10,260 ));
+
+
+
+
+for ( i = 0 ; i < 4 ; i++ )
 {
     sphere.add( pics[i] );
+    sphere.add( plates[i] );
+    sphere.add( rods[i] );
+    
 }
 scene.add( sphere );
 
@@ -226,8 +159,6 @@ scene.add( sphere );
 
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
-
-
 function mouseDown(event)
 {
     event.preventDefault();
@@ -238,10 +169,11 @@ function mouseDown(event)
     var intersects = raycaster.intersectObjects(meshObjects);
     if ( intersects.length > 0 )
     {
-        for (  i = 0 ; i < 24 ; i++  )
+        for (  i = 0 ; i < 4 ; i++  )
         {
             intersects[i].object.callback();
         }
+        canvas.style.cursor = "pointer" ;
         
     }
 }
@@ -255,28 +187,29 @@ function mouseMove(event)
     var canvas = document.body.getElementsByTagName('canvas')[0];
     if ( intersects.length > 0 )
     {
-        for ( var i = 0 ; i < 24 ; i++)
+        for ( var i = 0 ; i < 4 ; i++)
         { 
-            intersects[i].object.rotation.y += 0.05; 
+            intersects[i].object.material.color.set(0xFF0000);
         }
         
         canvas.style.cursor = "pointer" ;
     }
     else{ canvas.style.cursor = "default"; }
+    
+   
 }
 document.addEventListener('mousedown',mouseDown,false);
 document.addEventListener('mousemove',mouseMove,false);
 
 
-var k =0 ;
+var k = 0 ;
 var l = Math.PI/2 ;
 var m = 0 ;
 var n = Math.PI/2 ;
 function animation()
 {
     requestAnimationFrame( animation );
-    
-    camera.position.z = 900 + 200*( Math.sin( k ) +Math.cos(k)) +  200*Math.cos(l)  ;
+    camera.position.z = 1000 + 200*( Math.sin( k ) +Math.cos(k)) +  200*Math.cos(l)  ;
     camera.position.x =  600*Math.sin(l) ;
     camera.position.y =  600*Math.sin(l + Math.PI/4) ;
 
@@ -291,7 +224,53 @@ function animation()
     m = m + 0.005 ;
     n = n + 0.02 ;
     camera.lookAt( new THREE.Vector3(0,0,0) );
+
+   update();
     
     renderer.render( scene , camera );
 }
 animation();
+
+
+
+
+function update()
+{
+	
+    
+	var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+	projector.unprojectVector( vector, camera );
+	var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+	var intersects = ray.intersectObjects( pics );
+
+	if ( intersects.length > 0 )
+	{
+		if ( intersects[ 0 ].object != INTERSECTED ) 
+		{
+			if ( INTERSECTED ) 
+				INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+			INTERSECTED = intersects[ 0 ].object;
+			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+            INTERSECTED.material.color.setHex( 0x00ff00 );
+            
+		}
+	} 
+	else 
+	{
+		if ( INTERSECTED ) 
+            INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+            
+        INTERSECTED = null;
+        
+        
+	}
+
+
+	
+	
+	controls.update();
+	
+}
+
+
